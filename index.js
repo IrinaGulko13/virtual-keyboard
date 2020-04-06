@@ -35,5 +35,167 @@ window.onload = function () {
       }
     }
     let shift = 'shiftOff';
+
+    function getCookie(name) {
+      let langCookie = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+      return langCookie ? langCookie[2] : null;
+    }
   
-    
+    let lang = getCookie('lang') ? getCookie('lang') : 'en';
+
+    function createKeyboard(keyboard, langKey, shift) {
+      let changeBtn;
+      for (let row in keyboard) {
+        let rowBtns = document.createElement('div');
+        rowBtns.className = 'row-key ' + row;
+        document.querySelector('.wrap-keyboard').append(rowBtns);
+        if (langKey == 'en' && shift == 'shiftOff') {
+          changeBtn = 0;
+        } else if (langKey == 'en' && shift == 'shiftOn') {
+          changeBtn = 1;
+        } else if (langKey == 'ru' && shift == 'shiftOff') {
+          changeBtn = 2;
+        } else {
+          changeBtn = 3;
+        }
+        for (let key in keyboard[row]) {
+          document.querySelector('.' + row).innerHTML += '<div class="key" id=' + key + '><div class="key-symb">' + keyboard[row][key][changeBtn] + '</div></div>';
+        }
+      }
+    }
+  
+    createKeyboard(keyboard, lang, 'shiftOff');
+  
+    function writeMouse() {
+      const getKey = document.querySelectorAll('.key');
+      getKey.forEach(function (btn) {
+        btn.addEventListener('mousedown', function () {
+          let idKey = this.id;
+          switch (idKey) {
+            case 'Tab':
+              document.getElementById('screen').value = document.getElementById('screen').value + '    ';
+              break;
+            case 'Enter':
+              document.getElementById('screen').value = document.getElementById('screen').value + '\n';
+              break;
+            case 'ControlRight':
+            case 'ControlLeft':
+            case 'AltLeft':
+            case 'AltRight':
+            case 'MetaLeft':
+            case 'Delete':
+              break;
+            case 'Backspace':
+              document.getElementById('screen').value = document.getElementById('screen').value.substr(0, document.getElementById('screen').value.length - 1);
+              break;
+            case 'CapsLock':
+              if (shift == 'shiftOff') {
+                document.querySelector('.wrap-keyboard').innerHTML = '';
+                createKeyboard(keyboard, lang, 'shiftOn');
+                shift = 'shiftOn';
+              } else {
+                document.querySelector('.wrap-keyboard').innerHTML = '';
+                createKeyboard(keyboard, lang, 'shiftOff');
+                shift = 'shiftOff';
+              }
+              writeMouse();
+              break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+              keyboardShift();
+              writeMouse();
+              break;
+            default:
+              document.getElementById('screen').value = document.getElementById('screen').value + document.getElementById(idKey).children[0].textContent;
+              break;
+          }
+          document.getElementById(idKey).classList.add("key-active");
+        });
+        btn.addEventListener('mouseup', function () {
+          let idKey = this.id;
+          document.getElementById(idKey).classList.remove('key-active');
+          switch (idKey) {
+            case 'ShiftLeft':
+            case 'ShiftRight':
+              document.querySelector('.wrap-keyboard').innerHTML = '';
+              createKeyboard(keyboard, lang, 'shiftOff');
+              writeMouse();
+              break;
+            default:
+              break;
+          }
+        });
+      });
+    }
+    writeMouse();
+  
+    function keyboardCaps() {
+      if (event.code == 'CapsLock' && (shift == 'shiftOff')) {
+        document.querySelector('.wrap-keyboard').innerHTML = '';
+        createKeyboard(keyboard, lang, 'shiftOn');
+        shift = 'shiftOn';
+      } else {
+        document.querySelector('.wrap-keyboard').innerHTML = '';
+        createKeyboard(keyboard, lang, 'shiftOff');
+        shift = 'shiftOff';
+      }
+      writeMouse();
+    }
+
+    function keyboardShift() {
+      document.querySelector('.wrap-keyboard').innerHTML = '';
+      createKeyboard(keyboard, lang, 'shiftOn');
+    }
+  
+    document.addEventListener('keydown', function (e) {
+      let idKey = event.code;
+      switch (event.code) {
+        case 'CapsLock':
+          keyboardCaps();
+          break;
+        case 'ControlRight':
+        case 'ControlLeft':
+        case 'AltLeft':
+        case 'AltRight':
+        case 'MetaLeft':
+        case 'Delete':
+          break;
+        case 'ShiftRight':
+          keyboardShift();
+          break;
+        case 'ShiftLeft':
+          keyboardShift();
+          break;
+        case 'Tab':
+          e.preventDefault();
+          document.getElementById('screen').value = document.getElementById('screen').value + '    ';
+          break;
+        case 'Enter':
+          e.preventDefault();
+          document.getElementById('screen').value = document.getElementById('screen').value + '\n';
+          break;
+        case 'Backspace':
+          e.preventDefault();
+          document.getElementById('screen').value = document.getElementById('screen').value.substr(0, document.getElementById('screen').value.length - 1);
+          break;
+        default:
+          e.preventDefault();
+          document.getElementById('screen').value = document.getElementById('screen').value + document.getElementById(idKey).children[0].textContent;
+          break;
+      }
+    });
+  
+    document.addEventListener('keyup', function () {
+      switch (event.code) {
+        case 'ShiftRight':
+          document.querySelector('.wrap-keyboard').innerHTML = '';
+          createKeyboard(keyboard, lang, 'shiftOff');
+          break;
+        case 'ShiftLeft':
+          document.querySelector('.wrap-keyboard').innerHTML = '';
+          createKeyboard(keyboard, lang, 'shiftOff');
+          break;
+        default:
+      }
+    });
+  }
