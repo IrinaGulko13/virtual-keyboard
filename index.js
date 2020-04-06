@@ -232,4 +232,15 @@ window.onload = function () {
       'AltLeft'
     );
 
+    document.addEventListener('keydown', function (event) {
+      document.getElementById('screen').focus();
+      let pressKey = event.code;
+      let element = document.getElementById(pressKey);
+      element.classList.add("key-active");
+    });
+    document.addEventListener('keyup', function (event) {
+      let pressKey = event.code;
+      let element = document.getElementById(pressKey);
+      element.classList.remove('key-active');
+    });
   }
