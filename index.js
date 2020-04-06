@@ -198,4 +198,38 @@ window.onload = function () {
         default:
       }
     });
+    function changeLang() {
+      if (lang == 'en') {
+        lang = 'ru';
+        document.cookie = "lang = ru";
+      } else {
+        lang = 'en';
+        document.cookie = "lang = en";
+      }
+      document.querySelector('.wrap-keyboard').innerHTML = '';
+      createKeyboard(keyboard, lang, 'shiftOff');
+      writeMouse();
+    }
+  
+    function runOnKeys(...codes) {
+      let pressed = new Set();
+      document.addEventListener('keydown', function (event) {
+        pressed.add(event.code);
+        for (let code of codes) {
+          if (!pressed.has(code)) {
+            return;
+          }
+        }
+        pressed.clear();
+        setTimeout(changeLang, 400);
+      });
+      document.addEventListener('keyup', function (event) {
+        pressed.delete(event.code);
+      });
+    }
+    runOnKeys(
+      'ControlLeft',
+      'AltLeft'
+    );
+
   }
